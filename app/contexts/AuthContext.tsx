@@ -1,6 +1,6 @@
-import api, { clearTokens, setTokens } from '@/services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import api, { clearTokens, setTokens } from 'services/api';
 
 type Role = 'EMPLOYEE' | 'HR' | 'ADMIN';
 
