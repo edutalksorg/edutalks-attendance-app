@@ -1,16 +1,17 @@
 import { AuthContext } from '@app/contexts/AuthContext';
+import { useRouter } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 // Define types for our form data
@@ -41,6 +42,8 @@ const App = () => {
   };
 
   const { login } = useContext(AuthContext) as any;
+  const { loginLocal } = useContext(AuthContext) as any;
+  const router = useRouter();
 
   const handleLogin = () => {
     const { email, password } = formData;
@@ -55,10 +58,19 @@ const App = () => {
       return;
     }
 
-    login(email, password).catch((err: any) => {
-      console.warn(err);
-      Alert.alert('Login failed', err?.response?.data?.message || String(err));
-    });
+    // Use local/dummy login for demo; fall back to remote login if desired
+    loginLocal(email, password)
+      .then(() => {
+        // navigate to Attendance tab after successful dummy login
+        router.replace('/attendance');
+      })
+      .catch((err: any) => {
+        // If local login fails, try real login
+        login(email, password).then(() => router.replace('/attendance')).catch((e: any) => {
+          console.warn(e);
+          Alert.alert('Login failed', e?.response?.data?.message || String(e));
+        });
+      });
   };
 
   const handleRegister = () => {

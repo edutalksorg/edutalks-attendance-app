@@ -1,9 +1,11 @@
 import { AuthContext } from '@app/contexts/AuthContext';
+import { useRouter } from 'expo-router';
 import React, { useContext } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
 export default function ProfileScreen() {
   const { user, logout } = useContext(AuthContext) as any;
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -12,7 +14,18 @@ export default function ProfileScreen() {
       <Text style={styles.item}>Email: {user?.email ?? '—'}</Text>
       <Text style={styles.item}>Role: {user?.role ?? '—'}</Text>
       <View style={{ marginTop: 20 }}>
-        <Button title="Logout" onPress={() => logout()} />
+        <Button
+          title="Logout"
+          onPress={async () => {
+            try {
+              await logout();
+            } catch (e) {
+              // ignore logout errors
+            }
+            // redirect to login/index page
+            router.replace('/');
+          }}
+        />
       </View>
     </View>
   );

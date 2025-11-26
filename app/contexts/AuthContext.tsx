@@ -22,6 +22,7 @@ type AuthState = {
 
 type AuthContextType = AuthState & {
   login: (emailOrCode: string, password: string) => Promise<void>;
+  loginLocal: (email: string, password: string) => Promise<void>;
   register: (payload: any) => Promise<void>;
   requestOtp: (identifier: string) => Promise<void>;
   verifyOtp: (identifier: string, otp: string) => Promise<void>;
@@ -38,6 +39,7 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   loading: true,
   login: async () => {},
+  loginLocal: async () => {},
   register: async () => {},
   requestOtp: async () => {},
   verifyOtp: async () => {},
@@ -95,7 +97,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   };
 
-  const register = async payload => {
+  const loginLocal = async (email: string, password: string) => {
+    // Lightweight local/dummy login useful for development & demo flows.
+    setLoading(true);
+    // Simple validation
+    if (!email || !password) {
+      setLoading(false);
+      throw new Error('Email and password required');
+    }
+    // Dummy user object
+    const dummyUser: User = {
+      id: 'local-user',
+      fullName: 'Local Demo User',
+      email,
+      role: 'EMPLOYEE',
+    };
+
+    // Set in-memory auth state (do not persist tokens for demo)
+    setUser(dummyUser);
+    setAccessToken('local-token');
+    setRefreshToken(null);
+    setLoading(false);
+  };
+
+  const register = async (payload: any) => {
     setLoading(true);
     await api.post('/api/v1/auth/register', payload);
     setLoading(false);
@@ -158,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!accessToken,
         loading,
         login,
+        loginLocal,
         register,
         requestOtp,
         verifyOtp,
