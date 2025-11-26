@@ -20,9 +20,9 @@ export default function ProfileScreen() {
             try {
               await logout();
             } catch (e) {
-              // ignore logout errors
+              
             }
-            // redirect to login/index page
+            
             router.replace('/');
           }}
         />
